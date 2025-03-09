@@ -1,0 +1,11 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/liblitemap-1fefb211e3ed9f5e.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/map.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/mod.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/slice_impl.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/vec_impl.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/liblitemap-1fefb211e3ed9f5e.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/map.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/mod.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/slice_impl.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/vec_impl.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/litemap-1fefb211e3ed9f5e.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/map.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/mod.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/slice_impl.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/vec_impl.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/map.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/mod.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/slice_impl.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/litemap-0.7.5/src/store/vec_impl.rs:

@@ -1,0 +1,114 @@
+{
+    "build": {
+        "beforeDevCommand": "npm run dev",
+        "beforeBuildCommand": "npm run build",
+        "devPath": "http://localhost:3000",
+        "distDir": "../out"
+    },
+    "package": {
+        "productName": "Freedom POS",
+        "version": "0.1.0"
+    },
+    "tauri": {
+        "allowlist": {
+            "all": true,
+            "fs": {
+                "all": true,
+                "scope": ["$APP/*", "$DOCUMENT/*", "$DOWNLOAD/*"]
+            },
+            "shell": {
+                "all": false,
+                "open": true
+            },
+            "window": {
+                "all": false,
+                "create": true,
+                "center": true,
+                "requestUserAttention": true,
+                "setResizable": true,
+                "setTitle": true,
+                "maximize": true,
+                "unmaximize": true,
+                "minimize": true,
+                "unminimize": true,
+                "show": true,
+                "hide": true,
+                "close": true,
+                "setDecorations": true,
+                "setAlwaysOnTop": true,
+                "setSize": true,
+                "setMinSize": true,
+                "setMaxSize": true,
+                "setPosition": true,
+                "setFullscreen": true,
+                "setFocus": true,
+                "setIcon": true,
+                "setSkipTaskbar": true,
+                "startDragging": true
+            },
+            "dialog": {
+                "all": false,
+                "ask": true,
+                "confirm": true,
+                "message": true,
+                "open": true,
+                "save": true
+            }
+        },
+        "bundle": {
+            "active": true,
+            "targets": ["deb", "rpm", "dmg", "app", "msi"],
+            "identifier": "com.freedompos.dev",
+            "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+            ],
+            "resources": [],
+            "copyright": "© 2025 Freedom POS",
+            "category": "DeveloperTool",
+            "shortDescription": "Modern Point of Sale System",
+            "longDescription": "A comprehensive point of sale system for small and medium businesses",
+            "deb": {
+                "depends": []
+            },
+            "macOS": {
+                "frameworks": [],
+                "minimumSystemVersion": "10.13",
+                "exceptionDomain": "",
+                "signingIdentity": null,
+                "entitlements": null
+            },
+            "windows": {
+                "certificateThumbprint": null,
+                "digestAlgorithm": "sha256",
+                "timestampUrl": ""
+            }
+        },
+        "security": {
+            "csp": "default-src 'self'; connect-src 'self' https://api.freedompos.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'"
+        },
+        "updater": {
+            "active": false,
+            "endpoints": [
+                "https://releases.freedompos.com/{{target}}/{{current_version}}"
+            ],
+            "dialog": true,
+            "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEI1Qzc0MkFEMzUyNUI1ODcKUldTSHRTVTFyVUxIdFZNenFZdU81S2xCM0Q1RXBMbVMxUmlTSEtJeUQvOU1zL0lQY2NxZUVCNzYK"
+        },
+        "windows": [
+            {
+                "title": "Freedom POS",
+                "width": 1280,
+                "height": 800,
+                "resizable": true,
+                "fullscreen": true,
+                "decorations": true,
+                "transparent": false,
+                "maximized": false
+            }
+        ]
+    }
+}
