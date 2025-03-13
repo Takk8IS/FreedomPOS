@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { useI18n } from "@/lib/i18n/context";
+import { auth } from "@/lib/auth";
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -23,6 +24,7 @@ import {
     Calculator,
     DollarSign,
     Puzzle,
+    LogOut,
 } from "lucide-react";
 
 const menuItems = [
@@ -90,12 +92,22 @@ const menuItems = [
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const { t } = useI18n();
+    const [user, setUser] = useState(auth.getCurrentUser());
+
+    useEffect(() => {
+        setUser(auth.getCurrentUser());
+    }, []);
+
+    const handleLogout = async () => {
+        await auth.logout();
+        router.push("/login");
+    };
 
     return (
         <>
-            {/* Mobile menu button */}
             <Button
                 variant="outline"
                 size="icon"
@@ -109,7 +121,6 @@ export function Sidebar() {
                 )}
             </Button>
 
-            {/* Sidebar */}
             <div
                 className={cn(
                     "fixed inset-y-0 left-0 z-40 w-64 bg-background border-r transform transition-transform duration-200 ease-in-out md:translate-x-0",
@@ -118,7 +129,7 @@ export function Sidebar() {
             >
                 <div className="flex flex-col h-full">
                     <div className="flex items-center justify-between h-16 px-6 border-b">
-                        <h1 className="text-1xl font-bold">Freedom POS</h1>
+                        <h1 className="text-2xl font-bold">FreedomPOS</h1>
                         <LanguageSwitcher />
                     </div>
                     <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -143,18 +154,28 @@ export function Sidebar() {
                         })}
                     </nav>
                     <div className="p-4 border-t">
-                        <div className="flex items-center gap-3 px-3 py-2">
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                                A
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                                    {user?.name?.charAt(0) || "U"}
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium">
+                                        {user?.name || t("common.admin_user")}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {user?.email || "admin@hipos.com"}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm font-medium">
-                                    {t("common.admin_user")}
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    admin@freedompos.com
-                                </p>
-                            </div>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={handleLogout}
+                                title={t("common.logout")}
+                            >
+                                <LogOut className="h-4 w-4" />
+                            </Button>
                         </div>
                     </div>
                 </div>

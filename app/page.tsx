@@ -19,9 +19,11 @@ import {
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n/context";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
     const { t } = useI18n();
+    const router = useRouter();
     const [mounted, setMounted] = useState(false);
     const [recentSales] = useState([
         { id: 1, amount: 95.93 },
@@ -38,6 +40,25 @@ export default function Home() {
     if (!mounted) {
         return null;
     }
+
+    const handleQuickAction = (action: string) => {
+        switch (action) {
+            case "new_sale":
+                router.push("/pos");
+                break;
+            case "add_product":
+                router.push("/products");
+                break;
+            case "add_customer":
+                router.push("/customers");
+                break;
+            case "system_settings":
+                router.push("/settings");
+                break;
+            default:
+                break;
+        }
+    };
 
     return (
         <div className="p-6">
@@ -151,7 +172,11 @@ export default function Home() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="outline" className="w-full">
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => router.push("/orders")}
+                        >
                             {t("common.view_all")} {t("dashboard.orders")}
                         </Button>
                     </CardFooter>
@@ -215,7 +240,11 @@ export default function Home() {
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button variant="outline" className="w-full">
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => router.push("/products")}
+                        >
                             {t("common.view_all")} {t("dashboard.products")}
                         </Button>
                     </CardFooter>
@@ -231,13 +260,17 @@ export default function Home() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="grid gap-2">
-                        <Button className="w-full justify-start">
+                        <Button
+                            className="w-full justify-start"
+                            onClick={() => handleQuickAction("new_sale")}
+                        >
                             <CreditCard className="mr-2 h-4 w-4" />
                             {t("dashboard.new_sale")}
                         </Button>
                         <Button
                             className="w-full justify-start"
                             variant="outline"
+                            onClick={() => handleQuickAction("add_product")}
                         >
                             <Package className="mr-2 h-4 w-4" />
                             {t("dashboard.add_product")}
@@ -245,6 +278,7 @@ export default function Home() {
                         <Button
                             className="w-full justify-start"
                             variant="outline"
+                            onClick={() => handleQuickAction("add_customer")}
                         >
                             <Users className="mr-2 h-4 w-4" />
                             {t("dashboard.add_customer")}
@@ -252,6 +286,7 @@ export default function Home() {
                         <Button
                             className="w-full justify-start"
                             variant="outline"
+                            onClick={() => handleQuickAction("system_settings")}
                         >
                             <Settings className="mr-2 h-4 w-4" />
                             {t("dashboard.system_settings")}

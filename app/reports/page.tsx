@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-    Calendar,
     Download,
     Printer,
     BarChart3,
@@ -22,7 +21,7 @@ import {
     DollarSign,
     ShoppingCart,
     Users,
-    Package,
+    Loader2,
 } from "lucide-react";
 import {
     BarChart,
@@ -40,6 +39,13 @@ import {
     Cell,
 } from "recharts";
 import { useI18n } from "@/lib/i18n/context";
+import { useToast } from "@/hooks/use-toast";
+import { format as formatDate } from "date-fns";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import { addDays } from "date-fns";
 
 // Sample sales data
 const salesData = [
@@ -117,7 +123,130 @@ const yAxisProps = {
 };
 
 export default function ReportsPage() {
+    const [, setActiveTab] = useState("sales");
+    const [loading, setLoading] = useState(false);
+    const [dateRange, setDateRange] = useState({
+        from: addDays(new Date(), -30),
+        to: new Date(),
+    });
     const { t } = useI18n();
+    const { toast } = useToast();
+
+    const handleExport = async (format: "excel" | "pdf") => {
+        try {
+            setLoading(true);
+
+            const reportData = {
+                sales: salesData.map((item) => ({
+                    Month: item.name,
+                    Sales: `$${item.sales}`,
+                    Orders: item.orders,
+                })),
+                categories: categoryData.map((item) => ({
+                    Category: item.name,
+                    Value: `${item.value}%`,
+                })),
+                hourly: hourlySalesData.map((item) => ({
+                    Hour: item.hour,
+                    Sales: `$${item.sales}`,
+                })),
+            };
+
+            if (format === "excel") {
+                const wb = XLSX.utils.book_new();
+
+                // Add sales worksheet
+                const salesWS = XLSX.utils.json_to_sheet(reportData.sales);
+                XLSX.utils.book_append_sheet(wb, salesWS, "Sales Overview");
+
+                // Add categories worksheet
+                const categoriesWS = XLSX.utils.json_to_sheet(
+                    reportData.categories,
+                );
+                XLSX.utils.book_append_sheet(wb, categoriesWS, "Categories");
+
+                // Add hourly sales worksheet
+                const hourlyWS = XLSX.utils.json_to_sheet(reportData.hourly);
+                XLSX.utils.book_append_sheet(wb, hourlyWS, "Hourly Sales");
+
+                XLSX.writeFile(wb, "Sales_Report.xlsx");
+            } else {
+                const doc = new jsPDF();
+
+                // Title
+                doc.setFontSize(16);
+                doc.text("Sales Report", 14, 15);
+                doc.setFontSize(10);
+                doc.text(
+                    `Generated on ${formatDate(new Date(), "PPP")}`,
+                    14,
+                    22,
+                );
+                doc.text(
+                    `Period: ${formatDate(dateRange.from, "PPP")} - ${formatDate(dateRange.to, "PPP")}`,
+                    14,
+                    29,
+                );
+
+                // Sales Overview
+                doc.setFontSize(14);
+                doc.text("Sales Overview", 14, 40);
+                autoTable(doc, {
+                    head: [["Month", "Sales", "Orders"]],
+                    body: reportData.sales.map((row) => Object.values(row)),
+                    startY: 45,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [66, 66, 66] },
+                });
+
+                // Categories
+                doc.addPage();
+                doc.setFontSize(14);
+                doc.text("Sales by Category", 14, 15);
+                autoTable(doc, {
+                    head: [["Category", "Percentage"]],
+                    body: reportData.categories.map((row) =>
+                        Object.values(row),
+                    ),
+                    startY: 20,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [66, 66, 66] },
+                });
+
+                // Hourly Sales
+                doc.addPage();
+                doc.setFontSize(14);
+                doc.text("Hourly Sales Distribution", 14, 15);
+                autoTable(doc, {
+                    head: [["Hour", "Sales"]],
+                    body: reportData.hourly.map((row) => Object.values(row)),
+                    startY: 20,
+                    styles: { fontSize: 8 },
+                    headStyles: { fillColor: [66, 66, 66] },
+                });
+
+                doc.save("Sales_Report.pdf");
+            }
+
+            toast({
+                title: "Success",
+                description: `Report exported to ${format.toUpperCase()} successfully`,
+            });
+        } catch (error) {
+            console.error("Export error:", error);
+            toast({
+                title: "Error",
+                description: `Failed to export report to ${format.toUpperCase()}`,
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handlePrint = () => {
+        window.print();
+    };
 
     return (
         <div className="p-6">
@@ -129,17 +258,58 @@ export default function ReportsPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        {t("common.date_range")}
+                    <DatePickerWithRange
+                        date={{
+                            from: dateRange.from,
+                            to: dateRange.to
+                        }}
+                        onDateChange={(newDateRange) => {
+                            if (newDateRange?.from && newDateRange?.to) {
+                                setDateRange({
+                                    from: newDateRange.from,
+                                    to: newDateRange.to
+                                });
+                            }
+                        }}
+                    />
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleExport("excel")}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Download className="h-4 w-4 mr-2" />
+                        )}
+                        Excel
                     </Button>
-                    <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4 mr-2" />
-                        {t("common.export")}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleExport("pdf")}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Download className="h-4 w-4 mr-2" />
+                        )}
+                        PDF
                     </Button>
-                    <Button variant="outline" size="sm">
-                        <Printer className="h-4 w-4 mr-2" />
-                        {t("common.print")}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handlePrint}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                            <Printer className="h-4 w-4 mr-2" />
+                        )}
+                        Print
                     </Button>
                 </div>
             </header>
@@ -210,15 +380,27 @@ export default function ReportsPage() {
                 </Card>
             </div>
 
-            <Tabs defaultValue="sales">
+            <Tabs defaultValue="sales" onValueChange={setActiveTab}>
                 <TabsList className="mb-4">
-                    <TabsTrigger value="sales">
+                    <TabsTrigger
+                        value="sales"
+                        className="flex items-center gap-2"
+                    >
+                        <BarChart3 className="h-4 w-4" />
                         {t("reports.sales_overview")}
                     </TabsTrigger>
-                    <TabsTrigger value="categories">
+                    <TabsTrigger
+                        value="categories"
+                        className="flex items-center gap-2"
+                    >
+                        <PieChart className="h-4 w-4" />
                         {t("reports.categories")}
                     </TabsTrigger>
-                    <TabsTrigger value="hourly">
+                    <TabsTrigger
+                        value="hourly"
+                        className="flex items-center gap-2"
+                    >
+                        <LineChart className="h-4 w-4" />
                         {t("reports.hourly_sales")}
                     </TabsTrigger>
                 </TabsList>
@@ -250,18 +432,14 @@ export default function ReportsPage() {
                                         <YAxis
                                             yAxisId="left"
                                             orientation="left"
-                                            {...{
-                                                ...yAxisProps,
-                                                stroke: COLORS[0],
-                                            }}
+                                            {...yAxisProps}
+                                            stroke={COLORS[0]}
                                         />
                                         <YAxis
                                             yAxisId="right"
                                             orientation="right"
-                                            {...{
-                                                ...yAxisProps,
-                                                stroke: COLORS[1],
-                                            }}
+                                            {...yAxisProps}
+                                            stroke={COLORS[1]}
                                         />
                                         <Tooltip {...tooltipStyle} />
                                         <Legend />

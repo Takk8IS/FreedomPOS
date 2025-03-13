@@ -10,9 +10,21 @@ import {
     DialogDescription,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
+    DialogFooter,
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Label } from "@/components/ui/label";
 import { BarcodeGenerator } from "@/components/barcode-generator";
+import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n/context";
 import {
     Search,
@@ -25,7 +37,21 @@ import {
     ArrowUpDown,
     Package,
     Barcode,
+    Save,
+    Loader2,
 } from "lucide-react";
+
+interface InventoryItem {
+    id: number;
+    sku: string;
+    name: string;
+    quantity: number;
+    minStock: number;
+    maxStock: number;
+    location: string;
+    lastUpdated: string;
+    barcode: string;
+}
 
 // Sample inventory data
 const inventory = [
@@ -55,7 +81,17 @@ const inventory = [
 
 export default function InventoryPage() {
     const [searchTerm, setSearchTerm] = useState("");
+    const [showBarcodeDialog, setShowBarcodeDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showAddDialog, setShowAddDialog] = useState(false);
+    const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(
+        null,
+    );
+    const [loading, setLoading] = useState(false);
+    const [editForm, setEditForm] = useState<Partial<InventoryItem>>({});
     const { t } = useI18n();
+    const { toast } = useToast();
 
     const filteredInventory = inventory.filter((item) => {
         return (
@@ -64,6 +100,210 @@ export default function InventoryPage() {
             item.location.toLowerCase().includes(searchTerm.toLowerCase())
         );
     });
+
+    const handleShowBarcode = (item: InventoryItem) => {
+        setSelectedItem(item);
+        setShowBarcodeDialog(true);
+    };
+
+    const handleEdit = (item: InventoryItem) => {
+        setSelectedItem(item);
+        setEditForm(item);
+        setShowEditDialog(true);
+    };
+
+    const handleDelete = (item: InventoryItem) => {
+        setSelectedItem(item);
+        setShowDeleteDialog(true);
+    };
+
+    const handleAdd = () => {
+        setEditForm({});
+        setShowAddDialog(true);
+    };
+
+    const handleSaveEdit = async () => {
+        try {
+            setLoading(true);
+            // In a real app, this would be an API call
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            toast({
+                title: "Success",
+                description: "Item updated successfully",
+            });
+
+            setShowEditDialog(false);
+            setSelectedItem(null);
+            setEditForm({});
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update item",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveAdd = async () => {
+        try {
+            setLoading(true);
+            // In a real app, this would be an API call
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            toast({
+                title: "Success",
+                description: "Item added successfully",
+            });
+
+            setShowAddDialog(false);
+            setEditForm({});
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to add item",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            setLoading(true);
+            // In a real app, this would be an API call
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            toast({
+                title: "Success",
+                description: "Item deleted successfully",
+            });
+
+            setShowDeleteDialog(false);
+            setSelectedItem(null);
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to delete item",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const ItemForm = () => (
+        <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="sku">SKU</Label>
+                    <Input
+                        id="sku"
+                        value={editForm.sku || ""}
+                        onChange={(e) =>
+                            setEditForm((prev) => ({
+                                ...prev,
+                                sku: e.target.value,
+                            }))
+                        }
+                        placeholder="Enter SKU"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="barcode">Barcode</Label>
+                    <Input
+                        id="barcode"
+                        value={editForm.barcode || ""}
+                        onChange={(e) =>
+                            setEditForm((prev) => ({
+                                ...prev,
+                                barcode: e.target.value,
+                            }))
+                        }
+                        placeholder="Enter barcode"
+                    />
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="name">Product Name</Label>
+                <Input
+                    id="name"
+                    value={editForm.name || ""}
+                    onChange={(e) =>
+                        setEditForm((prev) => ({
+                            ...prev,
+                            name: e.target.value,
+                        }))
+                    }
+                    placeholder="Enter product name"
+                />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="quantity">Quantity</Label>
+                    <Input
+                        id="quantity"
+                        type="number"
+                        value={editForm.quantity || ""}
+                        onChange={(e) =>
+                            setEditForm((prev) => ({
+                                ...prev,
+                                quantity: parseInt(e.target.value),
+                            }))
+                        }
+                        placeholder="Enter quantity"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="minStock">Min Stock</Label>
+                    <Input
+                        id="minStock"
+                        type="number"
+                        value={editForm.minStock || ""}
+                        onChange={(e) =>
+                            setEditForm((prev) => ({
+                                ...prev,
+                                minStock: parseInt(e.target.value),
+                            }))
+                        }
+                        placeholder="Enter min stock"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="maxStock">Max Stock</Label>
+                    <Input
+                        id="maxStock"
+                        type="number"
+                        value={editForm.maxStock || ""}
+                        onChange={(e) =>
+                            setEditForm((prev) => ({
+                                ...prev,
+                                maxStock: parseInt(e.target.value),
+                            }))
+                        }
+                        placeholder="Enter max stock"
+                    />
+                </div>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="location">Location</Label>
+                <Input
+                    id="location"
+                    value={editForm.location || ""}
+                    onChange={(e) =>
+                        setEditForm((prev) => ({
+                            ...prev,
+                            location: e.target.value,
+                        }))
+                    }
+                    placeholder="Enter location"
+                />
+            </div>
+        </div>
+    );
 
     return (
         <div className="p-6">
@@ -77,7 +317,7 @@ export default function InventoryPage() {
                     </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button>
+                    <Button onClick={handleAdd}>
                         <Plus className="h-4 w-4 mr-2" />
                         {t("inventory.add_item")}
                     </Button>
@@ -209,45 +449,25 @@ export default function InventoryPage() {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center gap-2">
-                                                        <Dialog>
-                                                            <DialogTrigger
-                                                                asChild
-                                                            >
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    className="h-8 w-8"
-                                                                >
-                                                                    <Barcode className="h-4 w-4" />
-                                                                </Button>
-                                                            </DialogTrigger>
-                                                            <DialogContent>
-                                                                <DialogHeader>
-                                                                    <DialogTitle>
-                                                                        {t(
-                                                                            "inventory.product_barcode",
-                                                                        )}
-                                                                    </DialogTitle>
-                                                                    <DialogDescription>
-                                                                        {t(
-                                                                            "inventory.barcode_description",
-                                                                        )}
-                                                                    </DialogDescription>
-                                                                </DialogHeader>
-                                                                <div className="py-4">
-                                                                    <BarcodeGenerator
-                                                                        value={
-                                                                            item.barcode
-                                                                        }
-                                                                        text={`${item.sku} - ${item.name}`}
-                                                                    />
-                                                                </div>
-                                                            </DialogContent>
-                                                        </Dialog>
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8"
+                                                            onClick={() =>
+                                                                handleShowBarcode(
+                                                                    item,
+                                                                )
+                                                            }
+                                                        >
+                                                            <Barcode className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="h-8 w-8"
+                                                            onClick={() =>
+                                                                handleEdit(item)
+                                                            }
                                                         >
                                                             <Edit className="h-4 w-4" />
                                                         </Button>
@@ -255,6 +475,11 @@ export default function InventoryPage() {
                                                             variant="ghost"
                                                             size="icon"
                                                             className="h-8 w-8 text-destructive"
+                                                            onClick={() =>
+                                                                handleDelete(
+                                                                    item,
+                                                                )
+                                                            }
                                                         >
                                                             <Trash2 className="h-4 w-4" />
                                                         </Button>
@@ -276,6 +501,133 @@ export default function InventoryPage() {
                     </div>
                 </CardContent>
             </Card>
+
+            {/* Barcode Dialog */}
+            <Dialog
+                open={showBarcodeDialog}
+                onOpenChange={setShowBarcodeDialog}
+            >
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>
+                            {t("inventory.product_barcode")}
+                        </DialogTitle>
+                        <DialogDescription>
+                            {selectedItem && t("inventory.barcode_description")}
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="py-4">
+                        {selectedItem && (
+                            <BarcodeGenerator
+                                value={selectedItem.barcode}
+                                text={`${selectedItem.sku} - ${selectedItem.name}`}
+                            />
+                        )}
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Dialog */}
+            <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Edit Item</DialogTitle>
+                        <DialogDescription>
+                            Make changes to the inventory item
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ItemForm />
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowEditDialog(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSaveEdit} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                <>
+                                    <Save className="mr-2 h-4 w-4" />
+                                    Save Changes
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Add Dialog */}
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add New Item</DialogTitle>
+                        <DialogDescription>
+                            Add a new item to inventory
+                        </DialogDescription>
+                    </DialogHeader>
+                    <ItemForm />
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => setShowAddDialog(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSaveAdd} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Adding...
+                                </>
+                            ) : (
+                                <>
+                                    <Plus className="mr-2 h-4 w-4" />
+                                    Add Item
+                                </>
+                            )}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <AlertDialog
+                open={showDeleteDialog}
+                onOpenChange={setShowDeleteDialog}
+            >
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete the item
+                            {selectedItem && ` "${selectedItem.name}"`} from
+                            inventory.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmDelete}
+                            disabled={loading}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                "Delete"
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     );
 }

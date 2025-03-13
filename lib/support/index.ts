@@ -1,9 +1,9 @@
 export const supportConfig = {
-    company: "Freedom POS Support",
+    company: "FreedomPOS Support",
     phone: "+1 (555) 123-4567",
-    email: "support@freedompos.com",
+    email: "support@hipos.com",
     hours: "24/7",
-    website: "https://support.freedompos.com",
+    website: "https://support.hipos.com",
 
     // Support levels
     levels: {
