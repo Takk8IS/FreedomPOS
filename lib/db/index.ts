@@ -1,3 +1,520 @@
+import { openDB, DBSchema, IDBPDatabase } from 'idb';
+import { DatabaseOperations, User, Product, WhereCondition } from './types';
+import { PostgresDB } from './postgres';
+
+// Database schema
+export interface HiPOSDB extends DBSchema {
+  users: {
+    key: string;
+    value: User;
+    indexes: { 'by-email': string };
+  };
+  products: {
+    key: string;
+    value: Product;
+    indexes: {};
+  };
+}
+
+// Environment detection
+export enum StorageEnvironment {
+  DESKTOP = 'desktop',
+  WEB = 'web',
+}
+
+// Detect if running in Tauri/desktop environment or web
+function detectEnvironment(): StorageEnvironment {
+  // Check for Tauri-specific variables
+  if (
+    typeof window !== 'undefined' &&
+    // @ts-ignore - Tauri global object
+    (window.__TAURI__ || process.env.TAURI_BUILD === 'true')
+  ) {
+    return StorageEnvironment.DESKTOP;
+  }
+  
+  // Check if specific web environment variable is set
+  if (process.env.NEXT_PUBLIC_USE_POSTGRES === 'true') {
+    return StorageEnvironment.WEB;
+  }
+  
+  // Default based on environment - if we're running server-side, use Postgres
+  if (typeof window === 'undefined') {
+    return StorageEnvironment.WEB;
+  }
+  
+  // Default to desktop if we can't determine
+  return StorageEnvironment.DESKTOP;
+}
+
+// Database class implementing the DatabaseOperations interface
+export class Database implements DatabaseOperations {
+  private db: IDBPDatabase<HiPOSDB> | null = null;
+  private static instance: Database;
+  private storageType: StorageEnvironment;
+  private postgresDB: PostgresDB | null = null;
+  private initialized = false;
+  
+  private constructor() {
+    this.storageType = detectEnvironment();
+    if (this.storageType === StorageEnvironment.WEB) {
+      this.postgresDB = PostgresDB.getInstance();
+    }
+  }
+  
+  /**
+   * Get the singleton instance of the Database
+   */
+  public static getInstance(): Database {
+    if (!Database.instance) {
+      Database.instance = new Database();
+    }
+    return Database.instance;
+  }
+  
+  /**
+   * Initialize the database connection
+   */
+  public async init(): Promise<void> {
+    try {
+      if (this.initialized) return;
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        this.db = await openDB<HiPOSDB>('hipos', 2, {
+          upgrade(db, oldVersion, newVersion) {
+            if (oldVersion < 1) {
+              const userStore = db.createObjectStore('users', { keyPath: 'id' });
+              userStore.createIndex('by-email', 'email', { unique: true });
+            }
+            if (oldVersion < 2) {
+              db.createObjectStore('products', { keyPath: 'id' });
+            }
+          },
+        });
+      } else {
+        // PostgresDB is already initialized in its singleton
+        if (!this.postgresDB) {
+          this.postgresDB = PostgresDB.getInstance();
+        }
+        await this.postgresDB.init();
+      }
+      
+      this.initialized = true;
+    } catch (error) {
+      console.error('Failed to initialize database:', error);
+      throw new Error(`Database initialization failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * SELECT operation - get all records from a table
+   */
+  public async select<T extends keyof HiPOSDB>(
+    table: T,
+  ): Promise<HiPOSDB[T]['value'][]> {
+    try {
+      await this.ensureInitialized();
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        return await this.db.getAll(table);
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.select(table);
+      }
+    } catch (error) {
+      console.error(`Failed to select from ${String(table)}:`, error);
+      throw new Error(`SELECT operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * SELECT operation with WHERE clause - get records matching condition
+   */
+  public async selectWhere<T extends keyof HiPOSDB>(
+    table: T,
+    where: WhereCondition
+  ): Promise<HiPOSDB[T]['value'][]> {
+    try {
+      await this.ensureInitialized();
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        
+        if (where.field === 'id') {
+          // If searching by ID, use get for better performance
+          const record = await this.db.get(table, where.value);
+          return record ? [record] : [];
+        } else if (table === 'users' && where.field === 'email') {
+          // If searching users by email, use the index
+          return await this.db.getAllFromIndex(table, 'by-email', where.value);
+        } else {
+          // Otherwise, get all and filter manually
+          const allRecords = await this.db.getAll(table);
+          return allRecords.filter(
+            record => (record as any)[where.field] === where.value
+          );
+        }
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.selectWhere(table, where);
+      }
+    } catch (error) {
+      console.error(`Failed to select from ${String(table)} with condition:`, error);
+      throw new Error(`SELECT WHERE operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * Get a single record by ID
+   */
+  public async getById<T extends keyof HiPOSDB>(
+    table: T,
+    id: string
+  ): Promise<HiPOSDB[T]['value'] | undefined> {
+    try {
+      await this.ensureInitialized();
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        return await this.db.get(table, id);
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.getById(table, id);
+      }
+    } catch (error) {
+      console.error(`Failed to get ${String(table)} by ID:`, error);
+      throw new Error(`getById operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * INSERT operation - add a new record
+   */
+  public async insert<T extends keyof HiPOSDB>(
+    table: T,
+    data: HiPOSDB[T]['value']
+  ): Promise<HiPOSDB[T]['value']> {
+    try {
+      await this.ensureInitialized();
+      
+      // Add timestamps 
+      const now = new Date().toISOString();
+      const dataWithTimestamps = {
+        ...data,
+        created_at: now,
+      };
+      
+      if (table === 'products') {
+        (dataWithTimestamps as any).updated_at = now;
+      }
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        await this.db.put(table, dataWithTimestamps);
+        return dataWithTimestamps;
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.insert(table, dataWithTimestamps);
+      }
+    } catch (error) {
+      console.error(`Failed to insert into ${String(table)}:`, error);
+      throw new Error(`INSERT operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * UPDATE operation - update an existing record
+   */
+  public async update<T extends keyof HiPOSDB>(
+    table: T,
+    id: string,
+    data: Partial<HiPOSDB[T]['value']>
+  ): Promise<HiPOSDB[T]['value']> {
+    try {
+      await this.ensureInitialized();
+      
+      // Add updated_at timestamp for products
+      const dataWithTimestamps = { ...data };
+      if (table === 'products') {
+        (dataWithTimestamps as any).updated_at = new Date().toISOString();
+      }
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        
+        // Get existing record
+        const existingRecord = await this.db.get(table, id);
+        if (!existingRecord) {
+          throw new Error(`Record with ID ${id} not found`);
+        }
+        
+        // Merge existing with new data
+        const updatedRecord = {
+          ...existingRecord,
+          ...dataWithTimestamps,
+        };
+        
+        // Save the updated record
+        await this.db.put(table, updatedRecord);
+        return updatedRecord;
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.update(table, id, dataWithTimestamps);
+      }
+    } catch (error) {
+      console.error(`Failed to update ${String(table)}:`, error);
+      throw new Error(`UPDATE operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * DELETE operation - remove a record
+   */
+  public async delete<T extends keyof HiPOSDB>(
+    table: T,
+    id: string
+  ): Promise<boolean> {
+    try {
+      await this.ensureInitialized();
+      
+      if (this.storageType === StorageEnvironment.DESKTOP) {
+        if (!this.db) throw new Error('IndexedDB not initialized');
+        
+        // Check if record exists
+        const existing = await this.db.get(table, id);
+        if (!existing) {
+          return false;
+        }
+        
+        // Delete the record
+        await this.db.delete(table, id);
+        return true;
+      } else {
+        if (!this.postgresDB) throw new Error('PostgresDB not initialized');
+        return await this.postgresDB.delete(table, id);
+      }
+    } catch (error) {
+      console.error(`Failed to delete from ${String(table)}:`, error);
+      throw new Error(`DELETE operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * Helper method to ensure the database is initialized
+   */
+  private async ensureInitialized(): Promise<void> {
+    if (!this.initialized) {
+      await this.init();
+    }
+  }
+  
+  /**
+   * Close database connections
+   */
+  public async close(): Promise<void> {
+    try {
+      if (this.storageType === StorageEnvironment.DESKTOP && this.db) {
+        this.db.close();
+        this.db = null;
+      }
+      
+      if (this.storageType === StorageEnvironment.WEB && this.postgresDB) {
+        await this.postgresDB.close();
+      }
+      
+      this.initialized = false;
+    } catch (error) {
+      console.error('Failed to close database:', error);
+      throw new Error(`Close operation failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+  
+  /**
+   * Get the current storage environment (for debugging)
+   */
+  public getStorageType(): StorageEnvironment {
+    return this.storageType;
+  }
+}
+
+// Export a default instance
+export default Database.getInstance();
+
+import { openDB, IDBPDatabase } from 'idb';
+import postgres from './postgres';
+import { 
+  User, 
+  Product, 
+  DatabaseOperations, 
+  HiPOSDB, 
+  StorageEnvironment, 
+  detectEnvironment 
+} from './types';
+
+class Database {
+  private db: IDBPDatabase<HiPOSDB> | null = null;
+  private static instance: Database;
+  private isDesktop: boolean = false;
+
+  private constructor() {
+    // Check if we're in a Tauri environment to determine if desktop app
+    this.isDesktop = typeof window !== 'undefined' && 
+      window.navigator.userAgent.includes('Tauri') || 
+      process.env.TAURI_BUILD === 'true';
+  }
+
+  public static getInstance(): Database {
+    if (!Database.instance) {
+      Database.instance = new Database();
+    }
+    return Database.instance;
+  }
+
+  async connect() {
+    if (!this.db && typeof window !== 'undefined') {
+      this.db = await openDB<HiPOSDB>('hipos', 2, {
+        upgrade(db, oldVersion, newVersion) {
+          if (oldVersion < 1) {
+            const userStore = db.createObjectStore('users', { keyPath: 'id' });
+            userStore.createIndex('by-email', 'email', { unique: true });
+          }
+          if (oldVersion < 2) {
+            db.createObjectStore('products', { keyPath: 'id' });
+          }
+        },
+      });
+    }
+  }
+
+  // This is the main method that decides where to route database operations
+  private async getDbHandler() {
+    // Always use IndexedDB for desktop
+    if (this.isDesktop) {
+      await this.connect();
+      return 'indexeddb';
+    }
+
+    // For web: use Postgres if server-side or if explicitly set to use database server
+    if (typeof window === 'undefined' || process.env.NEXT_PUBLIC_USE_POSTGRES === 'true') {
+      return 'postgres';
+    }
+
+    // Fallback to IndexedDB for web if Postgres isn't explicitly enabled
+    await this.connect();
+    return 'indexeddb';
+  }
+
+  // Generic CRUD operations that route to the appropriate database handler
+  async select(table: string, where?: { field: string; value: any }) {
+    const dbHandler = await this.getDbHandler();
+    
+    if (dbHandler === 'postgres') {
+      if (table === 'users') {
+        if (where?.field === 'email') {
+          return await postgres.getUserByEmail(where.value);
+        } else if (where?.field === 'id') {
+          return await postgres.getUserById(where.value);
+        }
+        return await postgres.getUsers();
+      } else if (table === 'products') {
+        if (where?.field === 'id') {
+          return await postgres.getProductById(where.value);
+        }
+        return await postgres.getProducts();
+      }
+    } else if (this.db) {
+      if (where) {
+        if (where.field === 'id') {
+          return await this.db.get(table, where.value);
+        } else if (where.field === 'email' && table === 'users') {
+          const index = this.db.transaction(table).store.index('by-email');
+          return await index.get(where.value);
+        }
+      } else {
+        return await this.db.getAll(table);
+      }
+    }
+    return null;
+  }
+
+  async insert(table: string, data: any) {
+    const dbHandler = await this.getDbHandler();
+    
+    if (dbHandler === 'postgres') {
+      if (table === 'users') {
+        return await postgres.createUser(data);
+      } else if (table === 'products') {
+        return await postgres.createProduct(data);
+      }
+    } else if (this.db) {
+      if (!data.id) {
+        data.id = crypto.randomUUID();
+      }
+      
+      if (!data.created_at) {
+        data.created_at = new Date().toISOString();
+      }
+      
+      if (table === 'products' && !data.updated_at) {
+        data.updated_at = new Date().toISOString();
+      }
+      
+      await this.db.put(table, data);
+      return data;
+    }
+    return null;
+  }
+
+  async update(table: string, id: string, data: any) {
+    const dbHandler = await this.getDbHandler();
+    
+    if (dbHandler === 'postgres') {
+      if (table === 'users') {
+        return await postgres.updateUser(id, data);
+      } else if (table === 'products') {
+        return await postgres.updateProduct(id, data);
+      }
+    } else if (this.db) {
+      const item = await this.db.get(table, id);
+      
+      if (item) {
+        const updatedItem = { ...item, ...data };
+        
+        if (table === 'products') {
+          updatedItem.updated_at = new Date().toISOString();
+        }
+        
+        await this.db.put(table, updatedItem);
+        return updatedItem;
+      }
+    }
+    return null;
+  }
+
+  async delete(table: string, id: string) {
+    const dbHandler = await this.getDbHandler();
+    
+    if (dbHandler === 'postgres') {
+      if (table === 'users') {
+        return await postgres.deleteUser(id);
+      } else if (table === 'products') {
+        return await postgres.deleteProduct(id);
+      }
+    } else if (this.db) {
+      const item = await this.db.get(table, id);
+      
+      if (item) {
+        await this.db.delete(table, id);
+        return item;
+      }
+    }
+    return null;
+  }
+}
+
+export default Database.getInstance();
+
 "use client";
 
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
