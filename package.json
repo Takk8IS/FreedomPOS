@@ -60,8 +60,10 @@
         "start": "next start",
         "lint": "next lint",
         "tauri": "tauri",
-        "desktop:dev": "tauri dev",
-        "desktop:build": "tauri build"
+        "desktop:dev": "TAURI_BUILD=true tauri dev",
+        "desktop:build": "TAURI_BUILD=true tauri build",
+        "desktop:dev:win": "set TAURI_BUILD=true && tauri dev",
+        "desktop:build:win": "set TAURI_BUILD=true && tauri build"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.9.0",

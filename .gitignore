@@ -36,10 +36,10 @@ web_modules/
 
 ## Framework & Libraries
 ### Next.js
-# .next/
-# out/
-# build/
-# dist/
+.next/
+out/
+build/
+dist/
 .cache/
 .vercel/
 .now/
@@ -151,9 +151,9 @@ $RECYCLE.BIN/
 # composer.lock
 # pnpm-lock.yaml
 ## Builds & Compiled
-# /build/
-# /dist/
-# /out/
+/build/
+/dist/
+/out/
 *.min.js
 *.min.css
 *.map
