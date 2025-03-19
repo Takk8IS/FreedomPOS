@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -14,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/db";
+import db from "@/lib/db";
 import { isUser } from "@/lib/db/types";
 import { compare } from "bcryptjs";
 import { Store, Loader2 } from "lucide-react";
@@ -41,31 +42,27 @@ export default function LoginPage() {
         try {
             setLoading(true);
 
-            // Find user by email
             const result = await db.query(
                 "SELECT * FROM users WHERE email = ?",
                 [formData.email],
             );
             const user = result.rows[0];
-            
+
             if (!user || !isUser(user)) {
                 throw new Error("Invalid credentials");
             }
-            
-            // Verify password
+
             const isValid = await compare(formData.password, user.password);
 
             if (!isValid) {
                 throw new Error("Invalid credentials");
             }
 
-            // Update last login
             await db.query(
                 "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?",
                 [user.id],
             );
 
-            // Store user session (you might want to use a proper session management system)
             localStorage.setItem(
                 "user",
                 JSON.stringify({
@@ -82,7 +79,6 @@ export default function LoginPage() {
                 description: "Logged in successfully",
             });
 
-            // Redirect to dashboard
             router.push("/");
         } catch (error) {
             console.error("Login error:", error);

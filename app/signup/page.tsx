@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/db";
+import db from "@/lib/db";
 import { hash } from "bcryptjs";
 import { Store } from "lucide-react";
 
@@ -53,12 +53,10 @@ export default function SignupPage() {
         try {
             setLoading(true);
 
-            // Hash password
             const hashedPassword = await hash(formData.password, 10);
 
-            // Create user
             const userId = crypto.randomUUID();
-            await db.query(
+            await db(
                 `INSERT INTO users (id, name, email, password, role, store_name)
          VALUES (?, ?, ?, ?, ?, ?)`,
                 [
@@ -76,7 +74,6 @@ export default function SignupPage() {
                 description: "Account created successfully",
             });
 
-            // Redirect to login
             router.push("/login");
         } catch (error) {
             console.error("Signup error:", error);

@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/db";
+import db from "@/lib/db";
 import { Store, ArrowLeft, Loader2 } from "lucide-react";
 import { randomBytes } from "crypto";
 
@@ -31,7 +31,6 @@ export default function ForgotPasswordPage() {
         try {
             setLoading(true);
 
-            // Check if user exists
             const result = await db.query(
                 "SELECT id FROM users WHERE email = ?",
                 [email],
@@ -41,12 +40,10 @@ export default function ForgotPasswordPage() {
                 throw new Error("User not found");
             }
 
-            // Generate reset token
             const token = randomBytes(32).toString("hex");
             const expires = new Date();
-            expires.setHours(expires.getHours() + 1); // Token expires in a hour
+            expires.setHours(expires.getHours() + 1);
 
-            // Save reset token
             await db.query(
                 `UPDATE users
          SET reset_token = ?,
@@ -55,8 +52,6 @@ export default function ForgotPasswordPage() {
                 [token, expires.toISOString(), email],
             );
 
-            // In a real application, you would send an email here
-            // For demo purposes, we&apos;ll redirect to the reset page directly
             router.push(`/reset-password?token=${token}`);
 
             toast({

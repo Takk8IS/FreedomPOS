@@ -37,10 +37,6 @@ export default function Home() {
         setMounted(true);
     }, []);
 
-    if (!mounted) {
-        return null;
-    }
-
     const handleQuickAction = (action: string) => {
         switch (action) {
             case "new_sale":
@@ -59,6 +55,10 @@ export default function Home() {
                 break;
         }
     };
+
+    if (!mounted) {
+        return null;
+    }
 
     return (
         <div className="p-6">
