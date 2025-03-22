@@ -97,6 +97,7 @@
         "@radix-ui/react-toggle-group": "^1.1.0",
         "@radix-ui/react-tooltip": "^1.1.2",
         "@supabase/auth-helpers-nextjs": "^0.10.0",
+        "@supabase/supabase-js": "^2.49.1",
         "@tanstack/react-table": "^8.13.2",
         "@tauri-apps/api": "^1.5.3",
         "@types/bcryptjs": "^2.4.6",

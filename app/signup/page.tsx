@@ -19,6 +19,9 @@ import db from "@/lib/db";
 import { hash } from "bcryptjs";
 import { Store } from "lucide-react";
 
+// Adicionar esta importação no topo do arquivo
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 export default function SignupPage() {
     const router = useRouter();
     const { toast } = useToast();
@@ -40,7 +43,7 @@ export default function SignupPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+    
         if (formData.password !== formData.confirmPassword) {
             toast({
                 title: "Error",
@@ -49,37 +52,74 @@ export default function SignupPage() {
             });
             return;
         }
-
+    
         try {
             setLoading(true);
-
-            const hashedPassword = await hash(formData.password, 10);
-
-            const userId = crypto.randomUUID();
-            await db(
-                `INSERT INTO users (id, name, email, password, role, store_name)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-                [
-                    userId,
-                    formData.fullName,
-                    formData.email,
-                    hashedPassword,
-                    "admin",
-                    formData.storeName,
-                ],
-            );
-
-            toast({
-                title: "Success",
-                description: "Account created successfully",
+            
+            // Usar a API do Supabase para cadastro
+            const supabase = createClientComponentClient();
+            
+            console.log("Iniciando cadastro no Supabase...");
+            
+            // Criar o usuário na autenticação do Supabase com metadados
+            // incluindo todas as informações necessárias
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: formData.email,
+                password: formData.password,
+                options: {
+                    data: {
+                        full_name: formData.fullName,
+                        store_name: formData.storeName,
+                        role: "admin"
+                    },
+                    // Para ambiente de desenvolvimento, podemos desativar a confirmação de email
+                    // Remova esta linha em produção
+                    emailRedirectTo: `${window.location.origin}/login`
+                }
             });
-
+            
+            console.log("Resposta do Supabase:", authData, authError);
+            
+            if (authError) {
+                console.error("Erro de autenticação:", authError);
+                throw authError;
+            }
+            
+            if (!authData.user) {
+                console.error("Usuário não criado no Supabase");
+                throw new Error("Failed to create user account");
+            }
+            
+            // Verificar se o usuário precisa confirmar o email
+            if (authData.user && !authData.user.email_confirmed_at) {
+                toast({
+                    title: "Account Created",
+                    description: "Please check your email to confirm your account before logging in.",
+                    duration: 6000,
+                });
+            } else {
+                toast({
+                    title: "Success",
+                    description: "Account created successfully. You can now log in.",
+                });
+            }
+    
             router.push("/login");
         } catch (error) {
             console.error("Signup error:", error);
+            
+            // Melhorar a mensagem de erro para o usuário
+            let errorMessage = "Failed to create account. Please try again.";
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if (typeof error === 'object' && error !== null) {
+                errorMessage = JSON.stringify(error);
+            }
+            
             toast({
                 title: "Error",
-                description: "Failed to create account. Please try again.",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {

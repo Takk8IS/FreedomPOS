@@ -1,6 +1,6 @@
 "use client";
 
-import db from "@/lib/db";
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export interface User {
     id: string;
@@ -12,8 +12,11 @@ export interface User {
 
 export class AuthService {
     private static instance: AuthService;
+    private supabase;
 
-    private constructor() {}
+    private constructor() {
+        this.supabase = createClientComponentClient();
+    }
 
     public static getInstance(): AuthService {
         if (!AuthService.instance) {
@@ -52,21 +55,16 @@ export class AuthService {
     }
 
     public async validateSession(): Promise<boolean> {
-        const user = this.getCurrentUser();
-        if (!user) return false;
         try {
-            const result: any = await db.query(
-                "SELECT id FROM users WHERE id = ? AND email = ?",
-                [user.id, user.email],
-            );
-
-            return result.rows.length > 0;
+            const { data } = await this.supabase.auth.getSession();
+            return !!data.session;
         } catch {
             return false;
         }
     }
 
     public async logout(): Promise<void> {
+        await this.supabase.auth.signOut();
         localStorage.removeItem("user");
     }
 }

@@ -20,6 +20,9 @@ import { isUser } from "@/lib/db/types";
 import { compare } from "bcryptjs";
 import { Store, Loader2 } from "lucide-react";
 
+// Adicionar esta importação no topo do arquivo
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+
 export default function LoginPage() {
     const router = useRouter();
     const { toast } = useToast();
@@ -38,53 +41,114 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+    
         try {
             setLoading(true);
-
-            const result = await db.query(
-                "SELECT * FROM users WHERE email = ?",
-                [formData.email],
-            );
-            const user = result.rows[0];
-
-            if (!user || !isUser(user)) {
-                throw new Error("Invalid credentials");
+            
+            const supabase = createClientComponentClient();
+            console.log("Attempting to sign in with:", formData.email);
+            
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: formData.email,
+                password: formData.password,
+            });
+            
+            if (error) {
+                console.error("Authentication error:", error);
+                // Tratamento específico para erro de email não confirmado
+                if (error.message === "Email not confirmed") {
+                    // Opcionalmente, podemos reenviar o email de confirmação
+                    await supabase.auth.resend({
+                        type: 'signup',
+                        email: formData.email,
+                        options: {
+                            emailRedirectTo: `${window.location.origin}/login`,
+                        },
+                    });
+                    
+                    toast({
+                        title: "Email not confirmed",
+                        description: "Please check your inbox and confirm your email. We've sent a new confirmation email.",
+                        variant: "destructive",
+                        duration: 6000,
+                    });
+                } else {
+                    throw error;
+                }
+                return;
             }
-
-            const isValid = await compare(formData.password, user.password);
-
-            if (!isValid) {
-                throw new Error("Invalid credentials");
+            
+            if (!data.user) {
+                console.error("No user returned from authentication");
+                throw new Error("User not found");
             }
-
-            await db.query(
-                "UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?",
-                [user.id],
-            );
-
-            localStorage.setItem(
-                "user",
-                JSON.stringify({
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    role: user.role,
-                    storeName: user.store_name,
-                }),
-            );
-
+            
+            console.log("Authentication successful, user ID:", data.user.id);
+            
+            // Create a basic user object with available information from auth
+            const basicUserData = {
+                id: data.user.id,
+                name: data.user.user_metadata?.full_name || "User",
+                email: data.user.email,
+                role: data.user.user_metadata?.role || "user",
+                storeName: data.user.user_metadata?.store_name || "Default Store"
+            };
+            
+            console.log("Created basic user data from auth:", basicUserData);
+            
+            // Store this basic data immediately
+            localStorage.setItem("user", JSON.stringify(basicUserData));
+            
+            // Try to get additional user data, but don't block login if it fails
+            try {
+                console.log("Fetching user data for ID:", data.user.id);
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('id, name, email, role, store_name')
+                    .eq('id', data.user.id)
+                    .single();
+                    
+                console.log("User data query response:", userData, userError);
+                    
+                if (!userError && userData) {
+                    console.log("User data found in database:", userData);
+                    // Update with more complete data from database
+                    localStorage.setItem(
+                        "user",
+                        JSON.stringify({
+                            id: userData.id,
+                            name: userData.name,
+                            email: userData.email,
+                            role: userData.role,
+                            storeName: userData.store_name,
+                        }),
+                    );
+                } else {
+                    console.log("Using basic user data from auth");
+                }
+            } catch (profileError) {
+                // Just log the error but continue with login
+                console.error("Error fetching additional user data:", profileError);
+                console.log("Continuing with basic user data");
+            }
+    
             toast({
                 title: "Success",
                 description: "Logged in successfully",
             });
-
-            router.push("/");
+    
+            router.push("/dashboard");
         } catch (error) {
             console.error("Login error:", error);
+            let errorMessage = "Invalid email or password";
+            
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            }
+            
             toast({
                 title: "Error",
-                description: "Invalid email or password",
+                description: errorMessage,
                 variant: "destructive",
             });
         } finally {
