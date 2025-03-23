@@ -1,0 +1,12 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libdispatch-8d0e37e2397f3764.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/ffi.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/group.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/queue.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/once.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/sem.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libdispatch-8d0e37e2397f3764.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/ffi.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/group.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/queue.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/once.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/sem.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/dispatch-8d0e37e2397f3764.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/ffi.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/group.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/queue.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/once.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/sem.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/ffi.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/group.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/queue.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/once.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/dispatch-0.2.0/src/sem.rs:

@@ -1,0 +1,11 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libstring_cache-194e39694f281bc3.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/atom.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/dynamic_set.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/static_sets.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/trivial_impls.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libstring_cache-194e39694f281bc3.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/atom.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/dynamic_set.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/static_sets.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/trivial_impls.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/string_cache-194e39694f281bc3.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/atom.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/dynamic_set.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/static_sets.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/trivial_impls.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/atom.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/dynamic_set.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/static_sets.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/string_cache-0.8.8/src/trivial_impls.rs:

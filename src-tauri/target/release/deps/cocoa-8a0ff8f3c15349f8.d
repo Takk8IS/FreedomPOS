@@ -1,0 +1,12 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libcocoa-8a0ff8f3c15349f8.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/appkit.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/base.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/foundation.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/quartzcore.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/macros.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libcocoa-8a0ff8f3c15349f8.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/appkit.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/base.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/foundation.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/quartzcore.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/macros.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/cocoa-8a0ff8f3c15349f8.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/appkit.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/base.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/foundation.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/quartzcore.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/macros.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/appkit.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/base.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/foundation.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/quartzcore.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cocoa-0.24.1/src/macros.rs:

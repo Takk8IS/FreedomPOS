@@ -1,0 +1,12 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libico-d6965c198ad9965f.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/macros.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/bmpdepth.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/icondir.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/image.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/restype.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/libico-d6965c198ad9965f.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/macros.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/bmpdepth.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/icondir.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/image.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/restype.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/ico-d6965c198ad9965f.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/macros.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/bmpdepth.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/icondir.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/image.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/restype.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/macros.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/bmpdepth.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/icondir.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/image.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/ico-0.4.0/src/restype.rs:

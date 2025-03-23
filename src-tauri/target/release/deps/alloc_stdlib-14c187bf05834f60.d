@@ -1,0 +1,9 @@
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/liballoc_stdlib-14c187bf05834f60.rmeta: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/liballoc_stdlib-14c187bf05834f60.rlib: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/david/Takk/Hub/projects/FreedomPOS/src-tauri/target/release/deps/alloc_stdlib-14c187bf05834f60.d: /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs /Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs
+
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/lib.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/heap_alloc.rs:
+/Users/david/.cargo/registry/src/index.crates.io-6f17d22bba15001f/alloc-stdlib-0.2.2/src/std_alloc.rs:
